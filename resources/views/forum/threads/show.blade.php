@@ -78,7 +78,8 @@
 
                                                 @include('_partials._update_modal', [
                                                     'identifier' => "unmark-solution-{$thread->id}",
-                                                    'route' => ['threads.solution.unmark', $thread->slug()],
+                                                    'route' => 'threads.solution.unmark',
+                                                    'routeParams' => $thread->slug(),
                                                     'title' => 'Unmark As Solution',
                                                     'body' => '<p>Confirm to unmark this reply as the solution for <strong>"'.e($thread->subject()).'"</strong>.</p>',
                                                 ])
@@ -89,7 +90,8 @@
 
                                                 @include('_partials._update_modal', [
                                                     'identifier' => "mark-solution-{$reply->id}",
-                                                    'route' => ['threads.solution.mark', $thread->slug(), $reply->id()],
+                                                    'route' => 'threads.solution.mark',
+                                                    'routeParams' => [$thread->slug(), $reply->id()],
                                                     'title' => 'Mark As Solution',
                                                     'body' => '<p>Confirm to mark this reply as the solution for <strong>"'.e($thread->subject()).'"</strong>.</p>',
                                                 ])
@@ -104,7 +106,8 @@
 
                     @include('_partials._delete_modal', [
                         'identifier' => "delete-reply-{$reply->id}",
-                        'route' => ['replies.delete', $reply->id()],
+                        'route' => 'replies.delete',
+                        'routeParams' => $reply->id(),
                         'title' => 'Delete Reply',
                         'body' => '<p>Are you sure you want to delete this reply? This cannot be undone.</p>',
                     ])
@@ -119,24 +122,26 @@
                     @else
                         <div class="my-8">
 
-                            {!! Form::open(['route' => 'replies.store']) !!}
+                            <form action="{{ route('replies.store') }}" method="POST">
+                                @csrf
+
                                 @formGroup('body')
-                                    {!! Form::label('body', 'Write a reply') !!}
-                                    {!! Form::textarea('body', null, ['class' => 'editor']) !!}
+                                    <label for="body">Write a reply</label>
+                                    <textarea name="body" id="body" class="editor"></textarea>
                                     @error('body')
                                 @endFormGroup
 
-                                {!! Form::hidden('replyable_id', $thread->id()) !!}
-                                {!! Form::hidden('replyable_type', 'threads') !!}
+                                <input type="hidden" name="replyable_id" value="{{ $thread->id() }}" />
+                                <input type="hidden" name="replyable_type" value="threads" />
 
                                 <div class="flex justify-between items-center mt-4">
                                     <p class="text-sm text-gray-500 mr-8">
                                         Please make sure you've read our <a href="{{ route('rules') }}" class="text-green-dark">Forum Rules</a> before replying to this thread.
                                     </p>
 
-                                    {!! Form::submit('Reply', ['class' => 'button button-primary']) !!}
+                                    <button type="submit" class="button button-primary">Reply</button>
                                 </div>
-                            {!! Form::close() !!}
+                            </form>
 
                         </div>
                     @endif
@@ -180,7 +185,8 @@
 
                     @include('_partials._delete_modal', [
                         'identifier' => 'deleteThread',
-                        'route' => ['threads.delete', $thread->slug()],
+                        'route' => 'threads.delete',
+                        'routeParams' => $thread->slug(),
                         'title' => 'Delete Thread',
                         'body' => '<p>Are you sure you want to delete this thread and its replies? This cannot be undone.</p>',
                     ])
